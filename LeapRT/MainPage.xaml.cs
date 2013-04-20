@@ -76,7 +76,10 @@ namespace LeapRT
 
         void listener_OnFrameUpdate(object sender, LeapListenerArgs e)
         {
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { TextBlock_HandCount.Text = e.currentframe.Hands.Count.ToString(); });
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { 
+                TextBlock_HandCount.Text = e.currentframe.Hands.Count.ToString();
+                TextBlock_FingerCount.Text = e.currentframe.Fingers.Count.ToString();
+            });
 
             
         }

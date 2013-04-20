@@ -25,6 +25,10 @@
                     <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Hands : " VerticalAlignment="Top"/>
                     <TextBlock x:Name="TextBlock_HandCount" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
                 </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Fingers : "/>
+                    <TextBlock x:Name="TextBlock_FingerCount" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Grid>
