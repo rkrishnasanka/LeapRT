@@ -51,6 +51,34 @@ namespace LeapRT
             controller = new Leap.Controller();
             controller.AddListener(listener);
 
+            listener.OnFrameUpdate += listener_OnFrameUpdate;
+            listener.OnDeviceStatusUpdate +=listener_OnDeviceStatusUpdate;
+        }
+
+        void listener_OnDeviceStatusUpdate(object sender, LeapListenerArgs e)
+        {
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { 
+                
+                string texttodisplay = "";
+
+                switch(e.devicestatus)
+                {
+                    case LeapDeviceState.connected: texttodisplay = "Connected"; break;
+                    case LeapDeviceState.disconnected: texttodisplay = "Disconnected"; break;
+                    case LeapDeviceState.exited: texttodisplay = "Exited"; break;
+                    case LeapDeviceState.initialized: texttodisplay = "Initialized"; break;
+                }
+
+                TextBlock_DeviceStatus.Text = texttodisplay;
+            });
+
+        }
+
+        void listener_OnFrameUpdate(object sender, LeapListenerArgs e)
+        {
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { TextBlock_HandCount.Text = e.currentframe.Hands.Count.ToString(); });
+
+            
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
