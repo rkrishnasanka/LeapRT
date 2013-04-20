@@ -34,16 +34,6 @@ namespace LeapRT
             //ll.OnLogUpdate += ll_OnLogUpdate;
         }
 
-        void ll_OnLogUpdate(object sender, LeapListenerArgs e)
-        {
-            //throw new NotImplementedException();
-            PrintLog(e);
-        }
-
-        private void PrintLog(LeapListenerArgs e)
-        {
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { TextBlock_log.Text += "\n" + e.logdata; });
-        }
 
         /// <summary>
         /// Invoked when this page is about to be displayed in a Frame.
@@ -63,57 +53,6 @@ namespace LeapRT
             listener.OnKeyTapGesture += listener_OnKeyTapGesture;
             listener.OnScreenTapGesture += listener_OnScreenTapGesture;
             listener.OnSwipeGesture += listener_OnSwipeGesture;
-        }
-        #region Gesture Event Handlers
-        void listener_OnSwipeGesture(object sender, LeapListenerArgs e)
-        {
-            PrintLog(e);
-        }
-
-        void listener_OnScreenTapGesture(object sender, LeapListenerArgs e)
-        {
-            PrintLog(e);
-        }
-
-        void listener_OnKeyTapGesture(object sender, LeapListenerArgs e)
-        {
-            PrintLog(e);
-        }
-
-        void listener_OnCircleGesture(object sender, LeapListenerArgs e)
-        {
-            PrintLog(e);
-        }
-
-        #endregion
-
-        void listener_OnDeviceStatusUpdate(object sender, LeapListenerArgs e)
-        {
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { 
-                
-                string texttodisplay = "";
-
-                switch(e.devicestatus)
-                {
-                    case LeapDeviceState.connected: texttodisplay = "Connected"; break;
-                    case LeapDeviceState.disconnected: texttodisplay = "Disconnected"; break;
-                    case LeapDeviceState.exited: texttodisplay = "Exited"; break;
-                    case LeapDeviceState.initialized: texttodisplay = "Initialized"; break;
-                }
-
-                TextBlock_DeviceStatus.Text = texttodisplay;
-            });
-
-        }
-
-        void listener_OnFrameUpdate(object sender, LeapListenerArgs e)
-        {
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { 
-                TextBlock_HandCount.Text = e.currentframe.Hands.Count.ToString();
-                TextBlock_FingerCount.Text = e.currentframe.Fingers.Count.ToString();
-            });
-
-            
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
@@ -140,5 +79,96 @@ namespace LeapRT
             }
 
         }
+
+        #region Leap Events
+
+        #region Gesture Event Handlers
+        void listener_OnSwipeGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        void listener_OnScreenTapGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        void listener_OnKeyTapGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        void listener_OnCircleGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        #endregion
+
+        void listener_OnDeviceStatusUpdate(object sender, LeapListenerArgs e)
+        {
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
+            {
+
+                string texttodisplay = "";
+
+                switch (e.devicestatus)
+                {
+                    case LeapDeviceState.connected: texttodisplay = "Connected"; break;
+                    case LeapDeviceState.disconnected: texttodisplay = "Disconnected"; break;
+                    case LeapDeviceState.exited: texttodisplay = "Exited"; break;
+                    case LeapDeviceState.initialized: texttodisplay = "Initialized"; break;
+                }
+
+                TextBlock_DeviceStatus.Text = texttodisplay;
+            });
+
+        }
+
+        void listener_OnFrameUpdate(object sender, LeapListenerArgs e)
+        {
+
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () =>
+            {
+                TextBlock_HandCount.Text = e.currentframe.Hands.Count.ToString();
+                TextBlock_FingerCount.Text = e.currentframe.Fingers.Count.ToString();
+
+                var frame = e.currentframe;
+
+                switch (frame.Hands.Count)
+                {
+                    case 1: circle_left.Visibility = Visibility.Visible;
+                        circle_right.Visibility = Visibility.Collapsed;
+                        break;
+
+                    case 2: circle_left.Visibility = Visibility.Visible;
+                        circle_right.Visibility = Visibility.Visible;
+                        break;
+
+                    case 0:
+                        circle_left.Visibility = Visibility.Collapsed;
+                        circle_left.Visibility = Visibility.Collapsed;
+                        break;
+                }
+            });
+        }
+
+        void ll_OnLogUpdate(object sender, LeapListenerArgs e)
+        {
+            //throw new NotImplementedException();
+            PrintLog(e);
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private void PrintLog(LeapListenerArgs e)
+        {
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { TextBlock_log.Text += "\n" + e.logdata; });
+        }
+
+        #endregion
+
     }
 }
