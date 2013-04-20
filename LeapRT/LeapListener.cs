@@ -18,12 +18,26 @@ namespace LeapRT
 
     public class LeapListenerArgs : EventArgs
     {
+        #region Public Properties
+
         public string logdata { get; set; }
 
         public LeapDeviceState devicestatus { get; set; }
 
         public Frame currentframe { get; set; }
 
+        public SwipeGesture swipegesture { get; set; }
+
+        public KeyTapGesture keytapgesture { get; set; }
+
+        public CircleGesture circlegesture { get; set; }
+
+        public ScreenTapGesture screentapgesture { get; set; }
+
+        #endregion
+
+        #region Constructors
+        
         public LeapListenerArgs(Frame frame)
         {
             this.currentframe = frame;
@@ -38,31 +52,63 @@ namespace LeapRT
         {
             this.logdata = line;
         }
+
+        #region Gesture Related
+        
+        public LeapListenerArgs(SwipeGesture gesture)
+        {
+            this.swipegesture = gesture;
+        }
+
+        public LeapListenerArgs(KeyTapGesture gesture)
+        {
+            this.keytapgesture = gesture;
+        }
+
+        public LeapListenerArgs(ScreenTapGesture gesture)
+        {
+            this.screentapgesture = gesture;
+        }
+
+        public LeapListenerArgs(CircleGesture gesture)
+        {
+            this.circlegesture = gesture;
+        }
+        
+        #endregion
+        
+        #endregion
     }
 
     public class LeapListener : Listener
     {
 
-        #region Event
+        #region Event Definitons
 
         public delegate void LogUpdateHandler(object sender, LeapListenerArgs e);
-
         public event LogUpdateHandler OnLogUpdate;
 
-
         public delegate void DeviceStatusUpdateHandler(object sender, LeapListenerArgs e);
-
         public event DeviceStatusUpdateHandler OnDeviceStatusUpdate;
 
-
         public delegate void FrameUpdateHandler(object sender, LeapListenerArgs e);
-
         public event FrameUpdateHandler OnFrameUpdate;
+
+        public delegate void KeyTapGestureHandler(object sender, LeapListenerArgs e);
+        public event KeyTapGestureHandler OnKeyTapGesture;
+
+        public delegate void CircleGestureHandler(object sender, LeapListenerArgs e);
+        public event CircleGestureHandler OnCircleGesture;
+
+        public delegate void ScreenTapGestureHandler(object sender, LeapListenerArgs e);
+        public event ScreenTapGestureHandler OnScreenTapGesture;
+
+        public delegate void SwipeGuestureHandler(object sender, LeapListenerArgs e);
+        public event SwipeGuestureHandler OnSwipeGesture;
 
         #endregion
 
-        #region Leap stuff
-        private Object thisLock = new Object();
+        #region Event Dispatching Methods
 
         private void SafeWriteLine(String line)
         {
@@ -74,7 +120,6 @@ namespace LeapRT
 
                 //fires the event only in the case of an event handler being present
                 if (OnLogUpdate == null) return;
-                
 
                 LeapListenerArgs args = new LeapListenerArgs(line);
                 OnLogUpdate(this, args);
@@ -96,11 +141,22 @@ namespace LeapRT
 
         private void UpdateFrame(Frame frame)
         {
-            if (OnFrameUpdate == null) return;
+            lock (thisLock)
+            {
+                //fires the event only in the case of an event handler being present
+                if (OnFrameUpdate == null) return;
 
-            LeapListenerArgs args = new LeapListenerArgs(frame);
-            OnFrameUpdate(this, args);
+                LeapListenerArgs args = new LeapListenerArgs(frame);
+                OnFrameUpdate(this, args);
+            }
         }
+
+
+        #endregion
+
+        #region Leap Default Stuff
+
+        private Object thisLock = new Object();
 
         public override void OnInit(Controller controller)
         {
@@ -184,6 +240,8 @@ namespace LeapRT
             }
 
             // Get gestures
+
+
             GestureList gestures = frame.Gestures();
             for (int i = 0; i < gestures.Count; i++)
             {
@@ -192,6 +250,9 @@ namespace LeapRT
                 switch (gesture.Type)
                 {
                     case Gesture.GestureType.TYPECIRCLE:
+
+                        if (OnCircleGesture == null) break;
+
                         CircleGesture circle = new CircleGesture(gesture);
 
                         // Calculate clock direction using the angle between circle normal and pointable
@@ -215,15 +276,44 @@ namespace LeapRT
                             sweptAngle = (circle.Progress - previousUpdate.Progress) * 360;
                         }
 
+                        var cargs = new LeapListenerArgs(circle);
+                        
+                        cargs.logdata = "Circle id: " + circle.Id
+                                       + ", " + circle.State
+                                       + ", progress: " + circle.Progress
+                                       + ", radius: " + circle.Radius
+                                       + ", angle: " + sweptAngle
+                                       + ", " + clockwiseness;
+
+                        OnCircleGesture(this, cargs);
+
                         //SafeWriteLine("Circle id: " + circle.Id
                         //               + ", " + circle.State
                         //               + ", progress: " + circle.Progress
                         //               + ", radius: " + circle.Radius
                         //               + ", angle: " + sweptAngle
                         //               + ", " + clockwiseness);
+
+
                         break;
                     case Gesture.GestureType.TYPESWIPE:
+
+                        if (OnSwipeGesture == null) break;
+
                         SwipeGesture swipe = new SwipeGesture(gesture);
+
+                        var sargs = new LeapListenerArgs(swipe);
+                        
+                         sargs.logdata = "Swipe id: " + swipe.Id
+                                       + ", " + swipe.State
+                                       + ", position: " + swipe.Position
+                                       + ", direction: " + swipe.Direction
+                                       + ", speed: " + swipe.Speed;
+
+                         
+
+                        OnSwipeGesture(this, sargs);
+
                         //SafeWriteLine("Swipe id: " + swipe.Id
                         //               + ", " + swipe.State
                         //               + ", position: " + swipe.Position
@@ -231,14 +321,40 @@ namespace LeapRT
                         //               + ", speed: " + swipe.Speed);
                         break;
                     case Gesture.GestureType.TYPEKEYTAP:
+
+                        if (OnKeyTapGesture == null) break;
+
                         KeyTapGesture keytap = new KeyTapGesture(gesture);
+
+                        var kargs = new LeapListenerArgs(keytap);
+
+                        kargs.logdata = "Tap id: " + keytap.Id
+                                       + ", " + keytap.State
+                                       + ", position: " + keytap.Position
+                                       + ", direction: " + keytap.Direction;
+
+                        OnKeyTapGesture(this, kargs);
+
                         //SafeWriteLine("Tap id: " + keytap.Id
                         //               + ", " + keytap.State
                         //               + ", position: " + keytap.Position
                         //               + ", direction: " + keytap.Direction);
                         break;
                     case Gesture.GestureType.TYPESCREENTAP:
+
+                        if (OnScreenTapGesture == null) break;
+
                         ScreenTapGesture screentap = new ScreenTapGesture(gesture);
+
+                        var targs = new LeapListenerArgs(screentap);
+
+                        targs.logdata = "Tap id: " + screentap.Id
+                                       + ", " + screentap.State
+                                       + ", position: " + screentap.Position
+                                       + ", direction: " + screentap.Direction;
+
+                        OnScreenTapGesture(this, targs);
+
                         //SafeWriteLine("Tap id: " + screentap.Id
                         //               + ", " + screentap.State
                         //               + ", position: " + screentap.Position

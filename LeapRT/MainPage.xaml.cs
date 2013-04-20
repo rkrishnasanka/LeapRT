@@ -37,7 +37,12 @@ namespace LeapRT
         void ll_OnLogUpdate(object sender, LeapListenerArgs e)
         {
             //throw new NotImplementedException();
-            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, ()=>{ TextBlock_log.Text += "\n" + e.logdata;});
+            PrintLog(e);
+        }
+
+        private void PrintLog(LeapListenerArgs e)
+        {
+            Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.High, () => { TextBlock_log.Text += "\n" + e.logdata; });
         }
 
         /// <summary>
@@ -53,7 +58,34 @@ namespace LeapRT
 
             listener.OnFrameUpdate += listener_OnFrameUpdate;
             listener.OnDeviceStatusUpdate +=listener_OnDeviceStatusUpdate;
+
+            listener.OnCircleGesture += listener_OnCircleGesture;
+            listener.OnKeyTapGesture += listener_OnKeyTapGesture;
+            listener.OnScreenTapGesture += listener_OnScreenTapGesture;
+            listener.OnSwipeGesture += listener_OnSwipeGesture;
         }
+        #region Gesture Event Handlers
+        void listener_OnSwipeGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        void listener_OnScreenTapGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        void listener_OnKeyTapGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        void listener_OnCircleGesture(object sender, LeapListenerArgs e)
+        {
+            PrintLog(e);
+        }
+
+        #endregion
 
         void listener_OnDeviceStatusUpdate(object sender, LeapListenerArgs e)
         {
