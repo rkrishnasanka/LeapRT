@@ -20,14 +20,17 @@
         </Grid>
         <Grid Grid.Column="1">
             <StackPanel Orientation="Vertical">
-                <TextBlock x:Name="TextBlock_DeviceStatus" FontSize="36" Text="hello"/>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Hands : " VerticalAlignment="Top"/>
-                    <TextBlock x:Name="TextBlock_HandCount" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+            		<TextBlock TextWrapping="Wrap" Text="Device Status : " FontSize="32" Margin="5,0"/>
+            		<TextBlock x:Name="TextBlock_DeviceStatus" FontSize="32"/>
+            	</StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Hands : " VerticalAlignment="Top" FontSize="21.333" Margin="5"/>
+                    <TextBlock x:Name="TextBlock_HandCount" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="21.333" Margin="5"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="Fingers : "/>
-                    <TextBlock x:Name="TextBlock_FingerCount" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"/>
+                    <TextBlock Text="Fingers : " FontSize="21.333" Margin="5"/>
+                    <TextBlock x:Name="TextBlock_FingerCount" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="21.333" Margin="5"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
